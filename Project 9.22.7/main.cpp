@@ -23,6 +23,7 @@ public:
 
 private:
     vector<double> price_list;
+    int total_cost = 0;
 };
 
 
@@ -32,6 +33,7 @@ void CashRegister::clear()
     while(!price_list.empty())
     {
         price_list.pop_back();
+        total_cost = 0;
     }
     
 }
@@ -40,19 +42,13 @@ void CashRegister::clear()
 void CashRegister::add_item(double price)
 {
     price_list.push_back(price);
+    total_cost += price*100;
 }
 
 //reimplemented this function to store cost as an integer
 int CashRegister::get_total() const
 {
-    double cost = 0;
-    
-    for(int j = 0; j < price_list.size(); j++)
-    {
-        cost += price_list[j];
-    }
-    
-    return cost*100;
+    return total_cost;
 }
 
 int CashRegister::get_count() const
@@ -76,6 +72,7 @@ int main(int argc, const char * argv[]) {
     c1.add_item(2.00);
     c1.add_item(5.00);
     c1.add_item(3.00);
+    c1.add_item(3.32);
     
     cout << "You have " << c1.get_count() << " items in your cart!" << endl;
     cout << endl;
