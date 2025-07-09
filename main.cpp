@@ -1,130 +1,95 @@
 //
 //  main.cpp
-//  Project 7.20.8
+//  Project 7.22.2
 //
-//  Created by Pradnya Kadam on 7/2/25.
-//
+//  Created by Pradnya Kadam on 7/3/25.
 
 #include <iostream>
 #include <string>
 #include <sstream>
 
-
 using namespace std;
 
-//Student Structure
-struct Student
+class Person
 {
-    //Student structure stores student first/last name & grade
-    string firstName;
-    string lastName;
+    public:
+        Person(string userName);
+        void befriend(Person p);
+        void unfriend(Person p);
+        string getName() const;
+        string get_friend_names();
+    private:
+        string firstName;
+        string friends;
     
-    char courseGrade;
 };
 
-
-
-//Print function
-void PrintInfo(vector<Student*> students)
+//Constructor
+Person::Person(string userName)
 {
-    char grades[5] = {'A', 'B', 'C', 'D', 'F'};
-    
-    //for each grade letter of interest...
-    for (int j = 0; j < 5; j++)
+    firstName = userName;
+}
+
+string Person::getName() const
+{
+    return firstName;
+}
+
+//Function to add to friends string
+void Person::befriend(Person p)
+{
+    //check if friends is empty, add the first name
+    if(friends.empty())
     {
-        //for each student...
-        for (int k = 0; k < students.size(); k++)
+        friends += p.getName();
+    }
+    // otherwise adds to the list of friends
+    else{
+        friends = friends + " " + p.getName();
+    }
+}
+
+void Person::unfriend(Person p)
+{
+    stringstream strm(get_friend_names());
+    string name;
+    
+    string updatedFriendList;
+    
+    while(strm >> name)
+    {
+        if(name != p.getName())
         {
-            //if the student's grade matches the grade of interest, print the student's info
-            if(students[k]->courseGrade == grades[j])
-            {
-                cout << students[k]->firstName << " "
-                << students[k]->lastName << " "
-                << students[k]->courseGrade << endl;
-            }
+            updatedFriendList = updatedFriendList + name + " ";
         }
+        
     }
     
-    
-};
+    friends = updatedFriendList;
+}
+
+string Person::get_friend_names()
+{
+    return friends;
+}
 
 int main(int argc, const char * argv[]) {
     
-    //storing input ofr
-    string input;
-   
-    //requests user input-- defines termination case
-    cout << "Please enter the Student's (1) first name (2) last name (3) grade!" << endl;
-    cout << "Enter '-1' when complete!" << endl;
+    Person p1("Harry");
     
-    //vector to store Students
-    vector<Student*> students;
+    Person p2("Ron");
+    Person p3("Hermione");
+    Person p4("Ginny");
+    Person p5("Draco");
     
-    //continues taking user input
-    while (true)
-    {
-        //getting entire line of user input
-        getline(cin, input);
-        
-        //exit criteria -- user enters "-1"
-        if(input == "-1")
-        {
-            break;
-        }
-        
-        //converts user input to a stringstream to be parsed
-        stringstream strm(input);
-        
-        string fName; //first name
-        string lName; // last name
-        char grade; //grade
-        
-        //separates the three components
-        strm >> fName >> lName >> grade;
-        
-        //check to see if all courseGrade is valid input
-        if(!isalpha(grade))
-        {
-            cout << "ERROR: invalid grade" << endl;
-            break;
-        }
-        else
-        {
-            //array containing all valid grade entries
-            //not including lowercase entries
-            char grades[5] = {'A', 'B', 'C', 'D', 'F'};
-        
-            bool isValid = false;
-            
-            //loop through each grade letter
-            for (int i = 0; i < 5; i++)
-            {
-                //verifies whether entered courseGrade is contained within valid courseGrades array
-                if(grades[i] == grade)
-                {
-                    isValid = true;
-                }
-            }
-            
-            //if the grade is not valid, throw error
-            if(!isValid)
-            {
-                cout << "ERROR: invalid grade" << endl;
-                break;
-            }
-                
-        }
-        
-        //allocates a new student structure
-        Student* ptr = new Student;
-        
-        //assigns values to data members
-        ptr->firstName = fName;
-        ptr->lastName = lName;
-        ptr->courseGrade = grade;
-        
-        students.push_back(ptr);
-    }
+    p1.befriend(p2);
+    p1.befriend(p3);
+    p1.befriend(p4);
+    p1.befriend(p5);
     
-    PrintInfo(students);
+    cout << p1.get_friend_names() << endl;
+    
+    p1.unfriend(p5);
+    
+    cout << p1.get_friend_names() << endl;
 }
