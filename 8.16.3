@@ -1,0 +1,50 @@
+//8.16.3//
+//Guillermo Chavarin//
+
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+// Helper: Remove commas from numbers like "66,322"
+string remove_commas(const string& str) {
+    string result;
+    for (char c : str) {
+        if (c != ',') result += c;
+    }
+    return result;
+}
+
+int main() {
+    string filename;
+    cout << "Enter baby name data file (e.g., babynames80s.txt): ";
+    cin >> filename;
+
+    ifstream file(filename);
+    if (!file) {
+        cerr << "Could not open file.\n";
+        return 1;
+    }
+
+    string line;
+    cout << left << setw(20) << "Name" << "Frequency" << endl;
+    cout << "------------------------------" << endl;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string name, freqStr;
+        
+        if (getline(ss, name, ',') && getline(ss, freqStr)) {
+            string cleanedFreq = remove_commas(freqStr);
+            int frequency = stoi(cleanedFreq);
+            cout << left << setw(20) << name << frequency << endl;
+        }
+    }
+
+    file.close();
+    return 0;
+}
