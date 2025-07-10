@@ -1,0 +1,40 @@
+// Chapter_7.20.3//
+//Coded by Guillermo Chavarin//
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    char buffer[1000];        
+    char* lines[100];         
+    int bufferIndex = 0;      
+    int lineCount = 0;        
+    char ch;
+    bool atLineStart = true;  
+
+    while (cin.get(ch) && bufferIndex < 1000) {
+        if (atLineStart && lineCount < 100) {
+            lines[lineCount++] = &buffer[bufferIndex]; 
+            atLineStart = false;
+        }
+
+        if (ch == '\n') {
+            buffer[bufferIndex++] = '\0'; 
+            atLineStart = true;
+        } else {
+            buffer[bufferIndex++] = ch;
+        }
+    }
+
+    // If the buffer isn't null-terminated at the end
+    if (bufferIndex < 1000)
+        buffer[bufferIndex] = '\0';
+
+    // Print lines in reverse order
+    for (int i = lineCount - 1; i >= 0; --i) {
+        cout << lines[i] << endl;
+    }
+
+    return 0;
+}
