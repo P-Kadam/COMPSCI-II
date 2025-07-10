@@ -1,92 +1,41 @@
 //
 //  main.cpp
-//  Project 9.22.6
+//  11.14.1
 //
-//  Created by Pradnya Kadam on 7/9/25.
+//  Created by Xander Noboa on 7/10/25.
 //
 
 #include <iostream>
+#include <string>
 #include <vector>
 
-using namespace std;
-
-//CashRegister class implementation
-class CashRegister
-{
-public:
-   void clear();
-   void add_item(double price);
-
-   double get_total() const;
-   int get_count() const;
-   void display_all();
-
-private:
-    vector<double> price_list;
+const std::vector<std::string> KEYPAD = {
+    "0", "1", "ABC", "DEF", "GHI",
+    "JKL", "MNO", "PQRS", "TUV", "WXYZ"
 };
 
-
-void CashRegister::clear()
-{
-    //loops through vector and removes all items/prices from it
-    while(!price_list.empty())
-    {
-        price_list.pop_back();
+void spellings(const std::string &number, std::string current, std::size_t index) {
+    if (index == number.size()) {
+        std::cout << current << '\n';
+        return;
     }
-    
-    
-}
 
-//adds new item price to end of vector
-void CashRegister::add_item(double price)
-{
-    price_list.push_back(price);
-}
+    char digit = number[index];
+    const std::string letters =
+        (digit >= '0' && digit <= '9') ? KEYPAD[digit - '0'] : std::string(1, digit);
 
-//sums all the prices and returns
-double CashRegister::get_total() const
-{
-    double cost = 0;
-    
-    for(int j = 0; j < price_list.size(); j++)
-    {
-        cost += price_list[j];
-    }
-    
-    return cost;
-}
-
-int CashRegister::get_count() const
-{
-    return price_list.size();
-}
-
-void CashRegister::display_all()
-{
-    for(int k = 0; k < price_list.size(); k++)
-    {
-        cout << "Item " << k + 1 << ": $" << price_list[k] << endl;
+    for (char letter : letters) {
+        spellings(number, current + letter, index + 1);
     }
 }
 
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <number>" << std::endl;
+        return 1;
+    }
 
-int main(int argc, const char * argv[]) {
-    
-    CashRegister c1;
-    
-    c1.add_item(2.00);
-    c1.add_item(5.00);
-    c1.add_item(3.00);
-    
-    cout << "You have " << c1.get_count() << " items in your cart!" << endl;
-    cout << endl;
-    
-    cout << "Here are all the prices of the items:" << endl;
-    c1.display_all();
-    cout << endl;
-    
-    cout << "The total price is: $" << c1.get_total() << endl;
-    
-    c1.clear();
-    cout << "You now have " << c1.get_count() << " items in your cart. You owe $" << c1.get_total() << endl;
+    std::string number = argv[1];
+    spellings(number, "", 0);
+    return 0;
 }
