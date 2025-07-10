@@ -1,0 +1,63 @@
+//9.22.8//
+//Guillermo Chavarin//
+
+#include <iostream>
+using namespace std;
+
+class CashRegister {
+private:
+    double total;
+    int item_count;
+    double tax_rate;
+    double total_tax;
+
+public:
+    
+    CashRegister(double rate) {
+        total = 0.0;
+        item_count = 0;
+        tax_rate = rate;
+        total_tax = 0.0;
+    }
+
+    
+    void add_item(double price) {
+        total += price;
+        item_count++;
+    }
+
+    
+    void add_taxable_item(double price) {
+        double tax = price * tax_rate;
+        total += price + tax;
+        total_tax += tax;
+        item_count++;
+    }
+
+    double get_total() const {
+        return total;
+    }
+
+    int get_count() const {
+        return item_count;
+    }
+
+    double get_total_tax() const {
+        return total_tax;
+    }
+};
+
+
+int main() {
+    CashRegister register1(0.08); 
+
+    register1.add_item(10.00);             
+    register1.add_taxable_item(20.00);     
+    register1.add_taxable_item(5.00);      
+
+    cout << "Total items: " << register1.get_count() << endl;
+    cout << "Total sales (including tax): $" << register1.get_total() << endl;
+    cout << "Total tax collected: $" << register1.get_total_tax() << endl;
+
+    return 0;
+}
