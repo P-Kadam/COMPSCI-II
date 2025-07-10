@@ -1,0 +1,65 @@
+//10.13.1//
+//Guillermo Chavarin//
+
+#include <iostream>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+using namespace std;
+
+class Clock {
+public:
+    
+    virtual int get_hours() const {
+        time_t current_time = time(0);
+        tm* local_time = localtime(&current_time);
+        return local_time->tm_hour;
+    }
+
+    
+    virtual int get_minutes() const {
+        time_t current_time = time(0);
+        tm* local_time = localtime(&current_time);
+        return local_time->tm_min;
+    }
+
+    
+    string get_time() const {
+        stringstream ss;
+        ss << setfill('0') << setw(2) << get_hours() << ":"
+           << setfill('0') << setw(2) << get_minutes();
+        return ss.str();
+    }
+};
+
+class WorldClock : public Clock {
+private:
+    int offset; 
+
+public:
+    WorldClock(int time_offset) {
+        offset = time_offset;
+    }
+
+    
+    int get_hours() const override {
+        int local_hour = Clock::get_hours();
+        int adjusted_hour = (local_hour + offset) % 24;
+        if (adjusted_hour < 0) adjusted_hour += 24; 
+        return adjusted_hour;
+    }
+    
+    
+};
+
+int main() {
+    Clock local_clock;
+    WorldClock ny_clock(3);  
+    WorldClock london_clock(8); 
+
+    cout << "Local Time:      " << local_clock.get_time() << endl;
+    cout << "New York Time:   " << ny_clock.get_time() << endl;
+    cout << "London Time:     " << london_clock.get_time() << endl;
+
+    return 0;
+}
