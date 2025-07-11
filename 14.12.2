@@ -1,0 +1,137 @@
+//14.12.2//
+//guillermo chavarin//
+
+
+#include <iostream>
+using namespace std;
+
+class List {
+private:
+    struct Node {
+        int data;
+        Node* next;
+    };
+
+    Node* first;
+    int size;
+
+public:
+    class Iterator {
+    private:
+        Node* pred;   
+        Node* curr;   
+        List* container;
+
+    public:
+        Iterator(Node* p, Node* c, List* lst) : pred(p), curr(c), container(lst) {}
+
+        int get() const {
+            return curr->data;
+        }
+
+        void next() {
+            pred = curr;
+            curr = curr->next;
+        }
+
+        bool equals(const Iterator& other) const {
+            return curr == other.curr;
+        }
+
+        
+        void remove() {
+            if (curr == container->first) {
+                container->first = curr->next;
+                delete curr;
+                curr = container->first;
+                pred = nullptr;
+            } else {
+                pred->next = curr->next;
+                delete curr;
+                curr = pred->next;
+            }
+            container->size--;
+        }
+    };
+
+    List() {
+        first = nullptr;
+        size = 0;
+    }
+
+    ~List() {
+        Node* current = first;
+        while (current != nullptr) {
+            Node* next = current->next;
+            delete current;
+            current = next;
+        }
+    }
+
+    void push_front(int value) {
+        Node* new_node = new Node{value, first};
+        first = new_node;
+        size++;
+    }
+
+    void push_back(int value) {
+        Node* new_node = new Node{value, nullptr};
+        if (first == nullptr) {
+            first = new_node;
+        } else {
+            Node* current = first;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = new_node;
+        }
+        size++;
+    }
+
+    void print() const {
+        Node* current = first;
+        while (current != nullptr) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+
+    Iterator begin() {
+        return Iterator(nullptr, first, this);
+    }
+
+    Iterator end() {
+        return Iterator(nullptr, nullptr, this);
+    }
+
+    int get_size() const {
+        return size;
+    }
+};
+
+int main() {
+    List myList;
+
+    myList.push_back(10);
+    myList.push_back(20);
+    myList.push_back(30);
+    myList.push_front(5);
+
+    cout << "Initial list: ";
+    myList.print();  
+
+    List::Iterator it = myList.begin();
+    while (!it.equals(myList.end())) {
+        if (it.get() == 10 || it.get() == 30) {
+            it.remove();  
+        } else {
+            it.next();
+        }
+    }
+
+    cout << "After removal: ";
+    myList.print();  
+
+    return 0;
+}
