@@ -1,0 +1,63 @@
+//
+//  main.cpp
+//  12.17.7
+//
+//  Created by Xander Noboa on 7/11/25.
+//
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Merge function to combine two sorted halves
+void merge(vector<int>& arr, int left, int mid, int right) {
+    vector<int> temp;
+    int i = left;
+    int j = mid;
+
+    // Merge two sorted ranges [left, mid) and [mid, right)
+    while (i < mid && j < right) {
+        if (arr[i] <= arr[j])
+            temp.push_back(arr[i++]);
+        else
+            temp.push_back(arr[j++]);
+    }
+
+    // Copy remaining elements
+    while (i < mid) temp.push_back(arr[i++]);
+    while (j < right) temp.push_back(arr[j++]);
+
+    // Write back to original array
+    for (int k = 0; k < temp.size(); ++k)
+        arr[left + k] = temp[k];
+}
+
+// Iterative merge sort (non-recursive)
+void merge_sort(vector<int>& arr) {
+    int n = arr.size();
+    for (int size = 1; size < n; size *= 2) {
+        for (int left = 0; left < n; left += 2 * size) {
+            int mid = min(left + size, n);
+            int right = min(left + 2 * size, n);
+            merge(arr, left, mid, right);
+        }
+    }
+}
+
+// Main function — make sure this is present!
+int main() {
+    vector<int> data = {5, 2, 9, 1, 7, 6, 3, 8, 4};
+
+    cout << "Before sorting:\n";
+    for (int num : data) cout << num << " ";
+    cout << "\n";
+
+    merge_sort(data);
+
+    cout << "After merge sort:\n";
+    for (int num : data) cout << num << " ";
+    cout << "\n";
+
+    return 0;
+}
