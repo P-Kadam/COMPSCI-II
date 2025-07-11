@@ -1,0 +1,34 @@
+// Code: 9.22.9
+// Program: CashRegister Daily Sales Tracking
+// Programmer: Riya Kanyan
+
+class CashRegister {
+private:
+    double sales_total = 0.0;  // Total sales amount
+    int sales_count = 0;       // Number of sales
+
+public:
+    CashRegister() : sales_total(0), sales_count(0) {}
+
+    // Record a sale of given amount
+    void record_sale(double amount) {
+        sales_total += amount;
+        sales_count++;
+    }
+
+    // Get total sales amount
+    double get_sales_total() const {
+        return sales_total;
+    }
+
+    // Get number of sales made
+    int get_sales_count() const {
+        return sales_count;
+    }
+
+    // Reset totals for new day
+    void reset_sales() {
+        sales_total = 0;
+        sales_count = 0;
+    }
+};
