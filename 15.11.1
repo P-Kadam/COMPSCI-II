@@ -1,0 +1,62 @@
+//15.11.1//
+//Guillermo Chavarin//
+
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <unordered_set>  
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
+
+string normalize(const string& word) {
+    string clean;
+    for (char ch : word) {
+        if (isalpha(ch)) {
+            clean += tolower(ch);
+        }
+    }
+    return clean;
+}
+
+int main() {
+    unordered_multiset<string> word_set;
+    string filename;
+
+    cout << "Enter file name: ";
+    cin >> filename;
+
+    ifstream infile(filename);
+    if (!infile) {
+        cerr << "Error: Could not open file " << filename << endl;
+        return 1;
+    }
+
+    string line, word;
+    while (getline(infile, line)) {
+        stringstream ss(line);
+        while (ss >> word) {
+            string normalized = normalize(word);
+            if (!normalized.empty()) {
+                word_set.insert(normalized);
+            }
+        }
+    }
+
+    
+    unordered_map<string, int> word_count;
+    for (const auto& w : word_set) {
+        word_count[w]++;
+    }
+
+    
+    cout << "\nWord Frequencies:\n";
+    for (const auto& pair : word_count) {
+        cout << pair.first << ": " << pair.second << endl;
+    }
+
+    return 0;
+}
