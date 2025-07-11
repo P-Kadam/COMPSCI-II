@@ -1,0 +1,104 @@
+//
+//  main.cpp
+//  10.13.1
+//
+//  Created by Pradnya Kadam on 7/9/25.
+// Tested by Guillermo Chavarin
+
+#include <iostream>
+#include <ctime>
+#include <string>
+#include <vector>  // <- Required!
+using namespace std;
+
+// BASE CLASS
+class Clock {
+public:
+    virtual int get_hours();
+    int get_minutes();
+    string get_time();
+    void set_alarm(int hours, int minutes);
+
+protected:
+    vector<int> alarm;
+    bool alarm_ring();
+};
+
+int Clock::get_hours() {
+    time_t current_time = time(0);
+    tm* local_time = localtime(&current_time);
+    int hours = local_time->tm_hour;
+    if (hours > 12) {
+        hours -= 12;
+    } else if (hours == 0) {
+        hours = 12; // Midnight
+    }
+    return hours;
+}
+
+int Clock::get_minutes() {
+    time_t current_time = time(0);
+    tm* local_time = localtime(&current_time);
+    return local_time->tm_min;
+}
+
+string Clock::get_time() {
+    string minutes = to_string(get_minutes());
+    if (minutes.size() == 1) {
+        minutes.insert(0, 1, '0');
+    }
+
+    if (alarm_ring() && !alarm.empty()) {
+        cout << "Alarm ringing at " << get_hours() << ":" << minutes << "!" << endl;
+        alarm.clear();
+    }
+
+    return to_string(get_hours()) + ":" + minutes;
+}
+
+void Clock::set_alarm(int hours, int minutes) {
+    alarm = {hours, minutes};
+}
+
+bool Clock::alarm_ring() {
+    if (alarm.empty()) return false;
+    int hr = get_hours();
+    int mins = get_minutes();
+    return (hr > alarm[0]) || (hr == alarm[0] && mins >= alarm[1]);
+}
+
+// DERIVED CLASS
+class WorldClock : public Clock {
+public:
+    WorldClock(int userOffset);
+    int get_hours() override;
+
+private:
+    int timeOffset;
+};
+
+WorldClock::WorldClock(int userOffset) {
+    timeOffset = userOffset;
+}
+
+int WorldClock::get_hours() {
+    int hours = Clock::get_hours() + timeOffset;
+    if (hours > 12) {
+        hours -= 12;
+    } else if (hours <= 0) {
+        hours += 12;
+    }
+    return hours;
+}
+
+int main() {
+    Clock localClock;
+    cout << "Local Time: " << localClock.get_time() << endl;
+
+    WorldClock nyClock(3);  // New York is 3 hours ahead (example)
+    nyClock.set_alarm(4, 2);  // Example alarm
+
+    cout << "New York Time: " << nyClock.get_time() << endl;
+
+    return 0;
+}
