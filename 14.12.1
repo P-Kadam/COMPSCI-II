@@ -1,0 +1,133 @@
+//14.12.1//
+//Guillermo Chavarin//
+
+
+#include <iostream>
+using namespace std;
+
+class List {
+private:
+    struct Node {
+        int data;
+        Node* next;
+        Node* prev;
+    };
+
+    Node* first;
+    int size;
+
+public:
+    List() {
+        first = nullptr;
+        size = 0;
+    }
+
+    ~List() {
+        while (size > 0) {
+            remove_front();
+        }
+    }
+
+    void add_back(int value) {
+        Node* new_node = new Node{value, nullptr, nullptr};
+        if (first == nullptr) {
+            first = new_node;
+            first->next = first;
+            first->prev = first;
+        } else {
+            Node* last = first->prev;
+            last->next = new_node;
+            new_node->prev = last;
+            new_node->next = first;
+            first->prev = new_node;
+        }
+        size++;
+    }
+
+    void add_front(int value) {
+        add_back(value);
+        first = first->prev;
+    }
+
+    void remove_front() {
+        if (first == nullptr) return;
+
+        if (size == 1) {
+            delete first;
+            first = nullptr;
+        } else {
+            Node* last = first->prev;
+            Node* to_delete = first;
+            first = first->next;
+            first->prev = last;
+            last->next = first;
+            delete to_delete;
+        }
+        size--;
+    }
+
+    void remove_back() {
+        if (first == nullptr) return;
+
+        if (size == 1) {
+            delete first;
+            first = nullptr;
+        } else {
+            Node* last = first->prev;
+            Node* new_last = last->prev;
+            new_last->next = first;
+            first->prev = new_last;
+            delete last;
+        }
+        size--;
+    }
+
+    void print_forward() const {
+        if (first == nullptr) return;
+        Node* curr = first;
+        for (int i = 0; i < size; ++i) {
+            cout << curr->data << " ";
+            curr = curr->next;
+        }
+        cout << endl;
+    }
+
+    void print_backward() const {
+        if (first == nullptr) return;
+        Node* curr = first->prev;
+        for (int i = 0; i < size; ++i) {
+            cout << curr->data << " ";
+            curr = curr->prev;
+        }
+        cout << endl;
+    }
+
+    int get_size() const {
+        return size;
+    }
+};
+
+int main() {
+    List clist;
+
+    clist.add_back(10);
+    clist.add_back(20);
+    clist.add_back(30);
+    clist.add_front(5);
+
+    cout << "Forward: ";
+    clist.print_forward();      
+
+    cout << "Backward: ";
+    clist.print_backward();     
+    clist.remove_front();      
+    clist.remove_back();        
+
+    cout << "After removal - Forward: ";
+    clist.print_forward();      
+
+    cout << "After removal - Backward: ";
+    clist.print_backward();    
+
+    return 0;
+}
