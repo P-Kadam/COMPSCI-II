@@ -1,0 +1,98 @@
+// Problem 7.20.2 - Copier Simulation
+// Programmer: Riya Kanyan
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int master_account = 0;
+    int project_accounts[10] = {0};     // 10 project accounts initialized to 0
+    int* users[100];                    // Pointers for 100 users
+
+    // Initially link all users to master account
+    for (int i = 0; i < 100; i++) {
+        users[i] = &master_account;
+    }
+
+    char main_choice, admin_choice;
+
+    do {
+        // Main menu
+        cout << "\nU)ser A)dministrator Q)uit\n";
+        cout << "Enter option: ";
+        cin >> main_choice;
+        main_choice = toupper(main_choice);
+
+        if (main_choice == 'U') {
+            // User mode
+            int user_id, copies;
+            cout << "Enter user ID (0-99): ";
+            cin >> user_id;
+            if (user_id < 0 || user_id > 99) {
+                cout << "Invalid user ID.\n";
+                continue;
+            }
+            cout << "Enter number of copies: ";
+            cin >> copies;
+            if (copies < 0) {
+                cout << "Invalid number of copies.\n";
+                continue;
+            }
+            *users[user_id] += copies; // Increment the linked account
+            cout << "Copies added successfully.\n";
+
+        } else if (main_choice == 'A') {
+            // Administrator mode
+            do {
+                cout << "\nB)alance M)aster P)roject Q)uit\n";
+                cout << "Enter option: ";
+                cin >> admin_choice;
+                admin_choice = toupper(admin_choice);
+
+                if (admin_choice == 'B') {
+                    // Show balances
+                    cout << "\nMaster account balance: " << master_account << endl;
+                    for (int i = 0; i < 10; i++) {
+                        cout << "Project " << i + 1 << " balance: " << project_accounts[i] << endl;
+                    }
+
+                } else if (admin_choice == 'M') {
+                    // Link user to master account
+                    int user_id;
+                    cout << "Enter user ID (0-99) to link to master: ";
+                    cin >> user_id;
+                    if (user_id < 0 || user_id > 99) {
+                        cout << "Invalid user ID.\n";
+                        continue;
+                    }
+                    users[user_id] = &master_account;
+                    cout << "User " << user_id << " linked to master account.\n";
+
+                } else if (admin_choice == 'P') {
+                    // Link user to project account
+                    int user_id, project_id;
+                    cout << "Enter user ID (0-99): ";
+                    cin >> user_id;
+                    cout << "Enter project ID (1-10): ";
+                    cin >> project_id;
+                    if (user_id < 0 || user_id > 99 || project_id < 1 || project_id > 10) {
+                        cout << "Invalid user or project ID.\n";
+                        continue;
+                    }
+                    users[user_id] = &project_accounts[project_id - 1];
+                    cout << "User " << user_id << " linked to Project " << project_id << ".\n";
+
+                } else if (admin_choice != 'Q') {
+                    cout << "Invalid admin option.\n";
+                }
+            } while (admin_choice != 'Q');
+
+        } else if (main_choice != 'Q') {
+            cout << "Invalid option.\n";
+        }
+
+    } while (main_choice != 'Q');
+
+    cout << "Exiting program.\n";
+    return 0;
+}
