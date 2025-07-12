@@ -1,1 +1,40 @@
+//7.20.4
+// coded by Jorge Vasquez
+// Tested by Guillermo Chavarin
 
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int main() {
+    string input;
+    char ch;
+    vector<char*> lines;
+
+    // Read input character by character
+    while (cin.get(ch)) {
+        input += ch;
+    }
+
+    // Replace newline with null terminator and record line start pointers
+    if (!input.empty()) {
+        lines.push_back(&input[0]);
+        for (size_t i = 0; i < input.size(); ++i) {
+            if (input[i] == '\n') {
+                input[i] = '\0';
+                if (i + 1 < input.size()) {
+                    lines.push_back(&input[i + 1]);
+                }
+            }
+        }
+    }
+
+    // Output lines in reverse order
+    for (int i = static_cast<int>(lines.size()) - 1; i >= 0; --i) {
+        cout << lines[i] << endl;
+    }
+
+    r
