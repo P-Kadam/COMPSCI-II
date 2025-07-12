@@ -3,7 +3,7 @@
 //  11.14.5
 //
 //  Created by Xander Noboa on 7/11/25.
-// Tested by Guillermo Chavarin
+// Tested by Guillermo Chavarin & Pradnya Kadam
 
 #include <iostream>
 #include <vector>
@@ -70,6 +70,13 @@ int main() {
 
     for (const string& p : perms) {
         cout << p << endl;
+    }
+
+    string input2 = "make";
+    vector<string> permutation = generate_permutations(input2);
+    
+    for (const string& k : permutation) {
+        cout << k << endl;
     }
 
     return 0;
