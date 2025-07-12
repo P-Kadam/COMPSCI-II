@@ -1,0 +1,92 @@
+// Code: 8.16.9
+// Program: Vigenère Cipher Encrypt/Decrypt
+// Programmer: Riya Kanyan
+// Tested by Youssef Ayad on 7/11/25.
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+// Shift a single character by shiftAmount (0-25), wrapping around A-Z
+char shiftChar(char c, int shiftAmount, bool encrypt) {
+    if (!isalpha(c)) return c;
+
+    bool isLower = islower(c);
+    char base = isLower ? 'a' : 'A';
+    int alphaIndex = c - base;
+
+    if (encrypt)
+        alphaIndex = (alphaIndex + shiftAmount) % 26;
+    else
+        alphaIndex = (alphaIndex - shiftAmount + 26) % 26;
+
+    return base + alphaIndex;
+}
+
+// Convert keyword letter to shift amount (A=0, B=1, ..., Z=25)
+int charToShift(char c) {
+    return toupper(c) - 'A';
+}
+
+int main(int argc, char* argv[]) {
+    if (argc < 5) {
+        cout << "Usage: vigenere [-d] -kKEY input.txt output.txt\n";
+        cout << "Example encrypt: vigenere -kTIGER input.txt output.txt\n";
+        cout << "Example decrypt: vigenere -d -kTIGER input.txt output.txt\n";
+        return 1;
+    }
+
+    bool decrypt = false;
+    int argIndex = 1;
+
+    if (string(argv[argIndex]) == "-d") {
+        decrypt = true;
+        argIndex++;
+    }
+
+    if (string(argv[argIndex]).substr(0, 2) != "-k") {
+        cerr << "Error: keyword (-kKEY) is required.\n";
+        return 1;
+    }
+
+    string keyword = string(argv[argIndex]).substr(2);
+    string inputFile = argv[argIndex + 1];
+    string outputFile = argv[argIndex + 2];
+
+    if (keyword.empty()) {
+        cerr << "Error: keyword cannot be empty.\n";
+        return 1;
+    }
+
+    ifstream in(inputFile);
+    ofstream out(outputFile);
+    if (!in) {
+        cerr << "Error: Cannot open input file.\n";
+        return 1;
+    }
+    if (!out) {
+        cerr << "Error: Cannot open output file.\n";
+        return 1;
+    }
+
+    char c;
+    int keyLen = keyword.length();
+    int keyPos = 0;
+
+    while (in.get(c)) {
+        if (isalpha(c)) {
+            int shift = charToShift(keyword[keyPos % keyLen]);
+            char encryptedChar = shiftChar(c, shift, !decrypt);
+            out << encryptedChar;
+            keyPos++;
+        } else {
+            out << c;
+        }
+    }
+
+    cout << (decrypt ? "Decryption" : "Encryption") << " completed successfully.\n";
+
+    return 0;
+}
