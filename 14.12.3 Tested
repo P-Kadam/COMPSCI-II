@@ -1,0 +1,151 @@
+//14.12.3//
+//Guillermo Chavarin//
+//Tested by Eddie Noboa//
+
+#include <iostream>
+using namespace std;
+
+class List {
+private:
+    struct Node {
+        int data;
+        Node* next;
+    };
+
+    Node* first;     
+    Node* dummy;     
+    int size;
+
+public:
+    class Iterator {
+    private:
+        Node* current;
+
+    public:
+        Iterator(Node* node) {
+            current = node;
+        }
+
+        int get() const {
+            return current->data;
+        }
+
+        void next() {
+            if (current != nullptr) {
+                current = current->next;
+            }
+        }
+
+        bool equals(const Iterator& other) const {
+            return current == other.current;
+        }
+
+        friend class List;
+    };
+
+    List() {
+        dummy = new Node{0, nullptr}; 
+        first = dummy;                
+        size = 0;
+    }
+
+    ~List() {
+        Node* current = first;
+        while (current != nullptr) {
+            Node* next = current->next;
+            delete current;
+            if (current == dummy) break;
+            current = next;
+        }
+    }
+
+    void push_back(int value) {
+        Node* new_node = new Node{value, dummy};
+        if (first == dummy) {
+            first = new_node;
+        } else {
+            Node* current = first;
+            while (current->next != dummy) {
+                current = current->next;
+            }
+            current->next = new_node;
+        }
+        size++;
+    }
+
+    void push_front(int value) {
+        Node* new_node = new Node{value, first};
+        first = new_node;
+        size++;
+    }
+
+    Iterator begin() const {
+        return Iterator(first);
+    }
+
+    Iterator end() const {
+        return Iterator(dummy);
+    }
+
+    void remove(Iterator& it) {
+        if (first == dummy || it.equals(end())) return;
+
+        Node* current = first;
+        Node* prev = nullptr;
+
+        while (current != dummy && current != it.current) {
+            prev = current;
+            current = current->next;
+        }
+
+        if (current == dummy) return;
+
+        if (prev == nullptr) {
+            
+            first = current->next;
+        } else {
+            prev->next = current->next;
+        }
+
+        delete current;
+        it.current = (prev == nullptr) ? first : prev->next;
+        size--;
+    }
+
+    void print() const {
+        for (Node* current = first; current != dummy; current = current->next) {
+            cout << current->data << " ";
+        }
+        cout << endl;
+    }
+
+    int get_size() const {
+        return size;
+    }
+};
+
+int main() {
+    List myList;
+
+    myList.push_back(10);
+    myList.push_back(20);
+    myList.push_back(30);
+    myList.push_front(5);
+
+    cout << "Initial list: ";
+    myList.print();  
+
+    auto it = myList.begin();
+    while (!it.equals(myList.end())) {
+        if (it.get() == 10 || it.get() == 30) {
+            myList.remove(it);  
+        } else {
+            it.next();
+        }
+    }
+
+    cout << "After removal: ";
+    myList.print();  
+
+    return 0;
+}
