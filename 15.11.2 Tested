@@ -1,0 +1,55 @@
+//
+//  main.cpp
+//  15.11.2
+//  Tested by Youssef Ayad on 7/11/25.
+//  Created by Xander Noboa on 7/11/25.
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <cctype>
+using namespace std;
+
+string normalize(const string& word) {
+    string clean;
+    for (char ch : word) {
+        if (isalpha(ch)) {
+            clean += tolower(ch);
+        }
+    }
+    return clean;
+}
+
+int main() {
+    unordered_map<string, int> word_count;   // <-- only container we need
+    string filename;
+
+    cout << "Enter file name: ";
+    cin >> filename;
+
+    ifstream infile(filename);
+    if (!infile) {
+        cerr << "Error: Could not open file " << filename << endl;
+        return 1;
+    }
+
+    string line, word;
+    while (getline(infile, line)) {
+        stringstream ss(line);
+        while (ss >> word) {
+            string normalized = normalize(word);
+            if (!normalized.empty()) {
+                ++word_count[normalized];    // increment frequency
+            }
+        }
+    }
+
+    cout << "\nWord Frequencies:\n";
+    for (const auto& [w, cnt] : word_count) {
+        cout << w << ": " << cnt << endl;
+    }
+
+    return 0;
+}
