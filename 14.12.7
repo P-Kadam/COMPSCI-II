@@ -1,0 +1,71 @@
+// Project:14.12.7
+// Programmer: Riya Kanyan
+
+#include <iostream>
+#include <stack>
+using namespace std;
+
+// Class to store row and column pair
+class Pair {
+public:
+    int row;
+    int col;
+    Pair(int r, int c) : row(r), col(c) {}
+};
+
+// Constants
+const int SIZE = 10;
+
+int main() {
+    int grid[SIZE][SIZE] = {0};  // Initialize grid to 0
+    stack<Pair> s;
+    int startRow, startCol;
+    int fillCount = 1;
+
+    // Prompt user for starting position
+    cout << "Enter starting row (0–9): ";
+    cin >> startRow;
+    cout << "Enter starting column (0–9): ";
+    cin >> startCol;
+
+    // Push starting position to stack
+    s.push(Pair(startRow, startCol));
+
+    // Directions: N, E, S, W
+    int dr[] = {-1, 0, 1, 0};
+    int dc[] = {0, 1, 0, -1};
+
+    // Flood fill
+    while (!s.empty()) {
+        Pair current = s.top();
+        s.pop();
+
+        int r = current.row;
+        int c = current.col;
+
+        // Check bounds and if cell is unfilled
+        if (r >= 0 && r < SIZE && c >= 0 && c < SIZE && grid[r][c] == 0) {
+            grid[r][c] = fillCount++;  // Fill cell with current count
+
+            // Push neighbors (N, E, S, W)
+            for (int i = 0; i < 4; i++) {
+                int nr = r + dr[i];
+                int nc = c + dc[i];
+                if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && grid[nr][nc] == 0) {
+                    s.push(Pair(nr, nc));
+                }
+            }
+        }
+    }
+
+    // Print filled grid
+    cout << "\nFilled Grid:\n";
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            cout << (grid[i][j] < 10 ? " " : "") << grid[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
