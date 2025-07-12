@@ -1,0 +1,95 @@
+//
+//  main.cpp
+//  Project 7.20.8
+//
+//  Created by Pradnya Kadam on 7/2/25.
+// Tested by Guillermo Chavarin
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>  // Required for using std::vector
+
+using namespace std;
+
+// Student structure to store name and grade
+struct Student {
+    string firstName;
+    string lastName;
+    char courseGrade;
+};
+
+// Function to print students grouped by grade (A-F)
+void PrintInfo(const vector<Student*>& students) {
+    char grades[5] = {'A', 'B', 'C', 'D', 'F'};
+
+    for (int j = 0; j < 5; j++) {
+        for (size_t k = 0; k < students.size(); k++) {
+            if (students[k]->courseGrade == grades[j]) {
+                cout << students[k]->firstName << " "
+                     << students[k]->lastName << " "
+                     << students[k]->courseGrade << endl;
+            }
+        }
+    }
+}
+
+int main() {
+    string input;
+    vector<Student*> students;
+
+    cout << "Please enter the Student's (1) first name (2) last name (3) grade!" << endl;
+    cout << "Enter '-1' when complete!" << endl;
+
+    while (true) {
+        getline(cin, input);
+
+        if (input == "-1") {
+            break;
+        }
+
+        stringstream strm(input);
+        string fName, lName;
+        char grade;
+
+        strm >> fName >> lName >> grade;
+
+        if (!isalpha(grade)) {
+            cout << "ERROR: invalid grade" << endl;
+            continue;
+        }
+
+        // Validate uppercase grade
+        char grades[5] = {'A', 'B', 'C', 'D', 'F'};
+        bool isValid = false;
+
+        for (int i = 0; i < 5; i++) {
+            if (grades[i] == grade) {
+                isValid = true;
+                break;
+            }
+        }
+
+        if (!isValid) {
+            cout << "ERROR: invalid grade" << endl;
+            continue;
+        }
+
+        // Create and store a new Student
+        Student* ptr = new Student;
+        ptr->firstName = fName;
+        ptr->lastName = lName;
+        ptr->courseGrade = grade;
+        students.push_back(ptr);
+    }
+
+    // Output students grouped by grade
+    PrintInfo(students);
+
+    // Free memory
+    for (size_t i = 0; i < students.size(); ++i) {
+        delete students[i];
+    }
+
+    return 0;
+}
