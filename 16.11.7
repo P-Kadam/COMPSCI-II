@@ -1,0 +1,142 @@
+//16.11.7
+// Created by Guillermo Chavarin
+
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cmath>
+#include <memory>
+#include <limits>
+
+using namespace std;
+
+struct Fact {
+    vector<char> criteria;
+    char outcome;
+};
+
+struct TreeNode {
+    string question;
+    unique_ptr<TreeNode> yes;
+    unique_ptr<TreeNode> no;
+    string result;
+};
+
+double uncertainty(double p) {
+    if (p == 0.0 || p == 1.0) return 0.0;
+    return -p * log2(p) - (1 - p) * log2(1 - p);
+}
+
+double compute_uncertainty(const vector<Fact>& facts, int criterion_index) {
+    int n = facts.size();
+    int y_total = 0, y_yes = 0, n_total = 0, n_yes = 0;
+    for (const Fact& f : facts) {
+        if (f.criteria[criterion_index] == 'Y') {
+            y_total++;
+            if (f.outcome == 'Y') y_yes++;
+        } else {
+            n_total++;
+            if (f.outcome == 'Y') n_yes++;
+        }
+    }
+
+    double u_y = y_total == 0 ? 0 : uncertainty(static_cast<double>(y_yes) / y_total);
+    double u_n = n_total == 0 ? 0 : uncertainty(static_cast<double>(n_yes) / n_total);
+
+    return (static_cast<double>(y_total) / n) * u_y + (static_cast<double>(n_total) / n) * u_n;
+}
+
+bool is_pure(const vector<Fact>& facts) {
+    char first = facts[0].outcome;
+    for (const auto& f : facts) {
+        if (f.outcome != first) return false;
+    }
+    return true;
+}
+
+unique_ptr<TreeNode> build_tree(const vector<string>& criteria, const vector<Fact>& facts, vector<bool> used) {
+    if (is_pure(facts)) {
+        auto node = unique_ptr<TreeNode>(new TreeNode());
+        node->result = facts[0].outcome == 'Y' ? "Yes" : "No";
+        return node;
+    }
+
+    int best_index = -1;
+    double best_uncertainty = numeric_limits<double>::max();
+    for (int i = 0; i < criteria.size(); ++i) {
+        if (!used[i]) {
+            double u = compute_uncertainty(facts, i);
+            if (u < best_uncertainty) {
+                best_uncertainty = u;
+                best_index = i;
+            }
+        }
+    }
+
+    if (best_index == -1) {
+        auto node = unique_ptr<TreeNode>(new TreeNode());
+        node->result = "Unknown";
+        return node;
+    }
+
+    used[best_index] = true;
+    vector<Fact> yes_facts, no_facts;
+    for (const auto& f : facts) {
+        if (f.criteria[best_index] == 'Y') yes_facts.push_back(f);
+        else no_facts.push_back(f);
+    }
+
+    auto node = unique_ptr<TreeNode>(new TreeNode());
+    node->question = criteria[best_index];
+    node->yes = build_tree(criteria, yes_facts, used);
+    node->no = build_tree(criteria, no_facts, used);
+    return node;
+}
+
+string query_tree(TreeNode* node) {
+    while (!node->result.size()) {
+        cout << node->question << " (Y/N): ";
+        char answer;
+        cin >> answer;
+        if (answer == 'Y') node = node->yes.get();
+        else node = node->no.get();
+    }
+    return node->result;
+}
+
+int main() {
+    ifstream file("facts.txt");
+    if (!file) {
+        cerr << "Error opening file.\n";
+        return 1;
+    }
+
+    vector<string> criteria;
+    string line;
+    while (getline(file, line) && !line.empty()) {
+        criteria.push_back(line);
+    }
+
+    vector<Fact> facts;
+    while (getline(file, line)) {
+        Fact f;
+        for (int i = 0; i < criteria.size(); ++i) {
+            f.criteria.push_back(line[i * 2]);
+        }
+        f.outcome = line.back();
+        facts.push_back(f);
+    }
+
+    vector<bool> used(criteria.size(), false);
+    auto root = build_tree(criteria, facts, used);
+
+    cout << "Decision tree built. Now answer the following questions:\n";
+    string result = query_tree(root.get());
+    cout << "Result: " << result << endl;
+
+    return 0;
+}
