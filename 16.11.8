@@ -1,0 +1,85 @@
+//16.11.8
+//created by Guillermo Chavarin
+
+
+
+#include <iostream>
+#include <sstream>
+#include <stack>
+#include <memory>
+#include <string>
+using namespace std;
+
+// Abstract base class for expression tree nodes
+class ExprNode {
+public:
+    virtual int evaluate() const = 0;
+    virtual ~ExprNode() = default;
+};
+
+// Node representing a number
+class NumberNode : public ExprNode {
+public:
+    NumberNode(int val) : value(val) {}
+    int evaluate() const override { return value; }
+
+private:
+    int value;
+};
+
+// Node representing an operator
+class OperatorNode : public ExprNode {
+public:
+    OperatorNode(char op, unique_ptr<ExprNode> l, unique_ptr<ExprNode> r)
+        : oper(op), left(move(l)), right(move(r)) {}
+
+    int evaluate() const override {
+        int l_val = left->evaluate();
+        int r_val = right->evaluate();
+        switch (oper) {
+            case '+': return l_val + r_val;
+            case '-': return l_val - r_val;
+            case '*': return l_val * r_val;
+            case '/': return l_val / r_val;
+            default: throw runtime_error("Unknown operator");
+        }
+    }
+
+private:
+    char oper;
+    unique_ptr<ExprNode> left;
+    unique_ptr<ExprNode> right;
+};
+
+// Parse a postfix expression and build the expression tree
+unique_ptr<ExprNode> parse_expression(istringstream& expr) {
+    stack<unique_ptr<ExprNode>> operands;
+    string token;
+
+    while (expr >> token) {
+        if (isdigit(token[0]) || (token.length() > 1 && isdigit(token[1]))) {
+            operands.push(unique_ptr<ExprNode>(new NumberNode(stoi(token))));
+        } else {
+            auto right = move(operands.top());
+            operands.pop();
+            auto left = move(operands.top());
+            operands.pop();
+            operands.push(unique_ptr<ExprNode>(new OperatorNode(token[0], move(left), move(right))));
+        }
+    }
+
+    return move(operands.top());
+}
+
+int main() {
+    cout << "Enter a postfix expression (e.g., '3 4 + 2 *'):" << endl;
+    string line;
+    getline(cin, line);
+
+    istringstream expr(line);
+    unique_ptr<ExprNode> tree = parse_expression(expr);
+
+    cout << "Result: " << tree->evaluate() << endl;
+
+    return 0;
+}
