@@ -1,5 +1,5 @@
 // Program: 15.11.5
-// Programmer: Riya Kanyan
+// Programmer: Riya Kanyan & Pradnya Kadam
 //Tester: Eddie Noboa
 
 #include <iostream>
@@ -25,6 +25,10 @@ public:
             return first_name < other.first_name;
         return id < other.id;
     }
+
+    bool operator==(const Student& other) const {
+        return id == other.id;
+    }
 };
 
 int main() {
@@ -36,9 +40,9 @@ int main() {
     Student s2("Jane", "Doe", 102);
     Student s3("Alice", "Brown", 103);
 
-    student_grades[s1] = 85.5;
-    student_grades[s2] = 92.0;
-    student_grades[s3] = 78.0;
+    student_grades.emplace(s1, 85.5);
+    student_grades.emplace(s2, 92.0);
+    student_grades.emplace(s3, 78.0);
 
     id_lookup[s1.id] = s1;
     id_lookup[s2.id] = s2;
