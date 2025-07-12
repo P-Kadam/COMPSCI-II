@@ -1,0 +1,63 @@
+//
+//  main.cpp
+//  14.12.1
+//
+//  Created by Xander Noboa on 7/11/25.
+// Tested by Youssef Ayad on 7/11/25.
+#include <iostream>
+#include <queue>
+using namespace std;
+
+class Pair {
+public:
+    int row;
+    int col;
+    Pair(int r, int c) : row(r), col(c) {}
+};
+
+const int SIZE = 10;
+
+int main() {
+    int grid[SIZE][SIZE] = {0};
+    queue<Pair> q;               //  <-- queue instead of stack
+    int startRow, startCol;
+    int fillCount = 1;
+
+    cout << "Enter starting row (0–9): ";
+    cin >> startRow;
+    cout << "Enter starting column (0–9): ";
+    cin >> startCol;
+
+    q.push(Pair(startRow, startCol));
+
+    int dr[] = {-1, 0, 1, 0};  // N, E, S, W
+    int dc[] = {0, 1, 0, -1};
+
+    while (!q.empty()) {
+        Pair current = q.front();   //  <-- front instead of top
+        q.pop();
+
+        int r = current.row;
+        int c = current.col;
+
+        if (r >= 0 && r < SIZE && c >= 0 && c < SIZE && grid[r][c] == 0) {
+            grid[r][c] = fillCount++;
+
+            for (int i = 0; i < 4; ++i) {
+                int nr = r + dr[i];
+                int nc = c + dc[i];
+                if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && grid[nr][nc] == 0)
+                    q.push(Pair(nr, nc));
+            }
+        }
+    }
+
+    cout << "\nFilled Grid:\n";
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j)
+            cout << (grid[i][j] < 10 ? " " : "") << grid[i][j] << " ";
+        cout << endl;
+    }
+
+    return 0;
+}
