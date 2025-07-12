@@ -1,0 +1,40 @@
+//
+//  main.cpp
+//  11.14.6
+//
+//  Created by Eddie Noboa on 7/10/25.
+// Tested by Guillermo Chavarin
+
+#include <iostream>
+#include <cctype>
+#include <string>
+
+bool is_palindrome(const std::string &s, int left, int right) {
+    while (left < right && !std::isalpha(static_cast<unsigned char>(s[left]))) {
+        ++left;
+    }
+    while (left < right && !std::isalpha(static_cast<unsigned char>(s[right]))) {
+        --right;
+    }
+    if (left >= right) {
+        return true;
+    }
+    if (std::tolower(static_cast<unsigned char>(s[left])) !=
+        std::tolower(static_cast<unsigned char>(s[right]))) {
+        return false;
+    }
+    return is_palindrome(s, left + 1, right - 1);
+}
+
+bool is_palindrome(const std::string &s) {
+    return is_palindrome(s, 0, static_cast<int>(s.size()) - 1);
+}
+
+int main() {
+    std::string test1 = "Madam, I'm Adam!";
+    std::string test2 = "Hello";
+    std::cout << std::boolalpha;
+    std::cout << is_palindrome(test1) << std::endl;
+    std::cout << is_palindrome(test2) << std::endl;
+    return 0;
+}
