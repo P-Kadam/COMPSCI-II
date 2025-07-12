@@ -1,1 +1,42 @@
 
+//
+//  main.cpp
+//  11.14.1
+//
+//  Created by Eddie Noboa on 7/10/25. 
+//Tested by Riya Kanyan
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+const std::vector<std::string> KEYPAD = {
+    "0", "1", "ABC", "DEF", "GHI",
+    "JKL", "MNO", "PQRS", "TUV", "WXYZ"
+};
+
+void spellings(const std::string &number, std::string current, std::size_t index) {
+    if (index == number.size()) {
+        std::cout << current << '\n';
+        return;
+    }
+
+    char digit = number[index];
+    const std::string letters =
+        (digit >= '0' && digit <= '9') ? KEYPAD[digit - '0'] : std::string(1, digit);
+
+    for (char letter : letters) {
+        spellings(number, current + letter, index + 1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <number>" << std::endl;
+        return 1;
+    }
+
+    std::string number = argv[1];
+    spellings(number, "", 0);
+    return 0;
+}
