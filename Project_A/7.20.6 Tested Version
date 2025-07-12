@@ -1,0 +1,58 @@
+//
+//  main.cpp
+//  14.12.1
+//
+//  Tested by Xander Noboa on 7/11/25.
+//
+// Created by Guillermo Chavarin
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    string input;
+    char ch;
+    vector<char*> lines;
+    char buffer[1000] = {0}; // Buffer to store input lines
+    int bufferIndex = 0; // Index to keep track of the current position in the buffer
+
+    // Read characters until the buffer is full or a space is encountered
+    while (cin.get(ch) && bufferIndex < 999) {
+        if (ch == ' ') {
+            break;
+        }
+        buffer[bufferIndex++] = ch;
+    }
+    buffer[bufferIndex] = '\0'; // Null-terminate the buffer
+
+    // Split the buffer into lines and store pointers to the lines
+    char* lineStart = buffer;
+    for (int i = 0; i < bufferIndex; i++) {
+        if (buffer[i] == '\n') {
+            buffer[i] = '\0'; // Replace newline with null terminator
+            lines.push_back(lineStart); // Store the start of the line
+            lineStart = &buffer[i + 1]; // Update the start of the next line
+        }
+    }
+    lines.push_back(lineStart); // Add the last line
+
+    cout << "Original order:\n";
+    for (char* line : lines) {
+        cout << line << endl;
+    }
+
+    // Sort the lines
+    sort(lines.begin(), lines.end(), [](const char* a, const char* b) {
+        return strcmp(a, b) < 0;
+    });
+
+    cout << "\nSorted order:\n";
+    for (char* line : lines) {
+        cout << line << endl;
+    }
+
+    return 0;
+}
