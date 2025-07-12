@@ -1,0 +1,99 @@
+//
+//  main.cpp
+//  8.16.7
+//
+//  Created by Xander Noboa on 7/11/25.
+//
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <cctype>
+
+using namespace std;
+
+// Function to remove duplicate characters from a string
+string removeDuplicates(const string& str) {
+    string result;
+    for (char c : str) {
+        if (result.find(c) == string::npos) {
+            result += c;
+        }
+    }
+    return result;
+}
+
+// Function to generate the cipher alphabet
+string generateCipherAlphabet(const string& keyword) {
+    string uniqueKeyword = removeDuplicates(keyword);
+    string remainingAlphabet;
+    for (char c = 'z'; c >= 'a'; --c) {
+        if (uniqueKeyword.find(c) == string::npos) {
+            remainingAlphabet += c;
+        }
+    }
+    return uniqueKeyword + remainingAlphabet;
+}
+
+// Function to encrypt or decrypt a string
+string transformText(const string& text, const string& cipherAlphabet, bool decrypt) {
+    string transformedText;
+    string reverseCipherAlphabet = cipherAlphabet;
+    reverse(reverseCipherAlphabet.begin(), reverseCipherAlphabet.end());
+
+    for (char c : text) {
+        if (isalpha(c)) {
+            char lowerC = tolower(c);
+            size_t pos = decrypt ? reverseCipherAlphabet.find(lowerC) : cipherAlphabet.find(lowerC);
+            char transformedChar = decrypt ? cipherAlphabet[pos] : reverseCipherAlphabet[pos];
+            transformedText += isupper(c) ? toupper(transformedChar) : transformedChar;
+        } else {
+            transformedText += c;
+        }
+    }
+    return transformedText;
+}
+
+int main(int argc, char* argv[]) {
+    if (argc < 4) {
+        cerr << "Usage: crypt -d/-e -k<keyword> <input_file> <output_file>" << endl;
+        return 1;
+    }
+
+    bool decrypt = (argv[1][1] == 'd');
+    string keyword = argv[2] + 2; // Skip the "-k" part
+    string inputFileName = argv[3];
+    string outputFileName = argv[4];
+
+    if (keyword.empty()) {
+        cerr << "Error: Keyword cannot be empty." << endl;
+        return 1;
+    }
+
+    string cipherAlphabet = generateCipherAlphabet(keyword);
+
+    ifstream inputFile(inputFileName);
+    ofstream outputFile(outputFileName);
+
+    if (!inputFile.is_open()) {
+        cerr << "Error: Could not open input file." << endl;
+        return 1;
+    }
+
+    if (!outputFile.is_open()) {
+        cerr << "Error: Could not open output file." << endl;
+        return 1;
+    }
+
+    string line;
+    while (getline(inputFile, line)) {
+        string transformedLine = transformText(line, cipherAlphabet, decrypt);
+        outputFile << transformedLine << endl;
+    }
+
+    inputFile.close();
+    outputFile.close();
+
+    return 0;
+}
