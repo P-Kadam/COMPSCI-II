@@ -1,0 +1,50 @@
+//
+//  main.cpp
+//  12.17.4
+//
+//  Created by Xander Noboa on 7/11/25.
+// Tested by Guillermo Chavarin
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <cmath>
+
+using namespace std;
+
+void radix_sort(vector<int>& arr) {
+    const int RADIX = 10;
+    vector<queue<int>> buckets(RADIX);
+
+    const int MAX_DIGITS = 3; // for numbers 0 to 999
+
+    for (int d = 0; d < MAX_DIGITS; ++d) {
+        for (int num : arr) {
+            int digit = (num / static_cast<int>(pow(10, d))) % 10;
+            buckets[digit].push(num);
+        }
+
+        int index = 0;
+        for (int i = 0; i < RADIX; ++i) {
+            while (!buckets[i].empty()) {
+                arr[index++] = buckets[i].front();
+                buckets[i].pop();
+            }
+        }
+    }
+}
+
+int main() {
+    vector<int> data = {329, 457, 657, 839, 436, 720, 355};
+
+    cout << "Before sorting:\n";
+    for (int num : data) cout << num << " ";
+    cout << "\n";
+
+    radix_sort(data);
+
+    cout << "After radix sort:\n";
+    for (int num : data) cout << num << " ";
+    cout << "\n";
+
+    return 0;
+}

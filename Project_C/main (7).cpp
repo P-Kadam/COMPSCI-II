@@ -1,0 +1,75 @@
+//
+//  main.cpp
+//  12.17.9
+//
+//  Created by Xander Noboa on 7/11/25.
+//
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cctype>
+using namespace std;
+
+// Splits a string into digit and non-digit parts
+vector<string> split_parts(const string& str) {
+    vector<string> parts;
+    string current;
+    bool in_digit = isdigit(str[0]);
+
+    for (char c : str) {
+        if (isdigit(c) == in_digit) {
+            current += c;
+        } else {
+            parts.push_back(current);
+            current = c;
+            in_digit = isdigit(c);
+        }
+    }
+    if (!current.empty()) {
+        parts.push_back(current);
+    }
+    return parts;
+}
+
+// Human-friendly comparator
+bool natural_less(const string& a, const string& b) {
+    vector<string> partsA = split_parts(a);
+    vector<string> partsB = split_parts(b);
+
+    size_t len = min(partsA.size(), partsB.size());
+    for (size_t i = 0; i < len; ++i) {
+        const string& sa = partsA[i];
+        const string& sb = partsB[i];
+
+        bool is_digit_a = all_of(sa.begin(), sa.end(), ::isdigit);
+        bool is_digit_b = all_of(sb.begin(), sb.end(), ::isdigit);
+
+        if (is_digit_a && is_digit_b) {
+            int na = stoi(sa);
+            int nb = stoi(sb);
+            if (na != nb) return na < nb;
+        } else {
+            if (sa != sb) return sa < sb;
+        }
+    }
+
+    return partsA.size() < partsB.size();
+}
+
+// ✅ Main entry point — required for the build to succeed
+int main() {
+    vector<string> files = {
+        "sec3_14.txt", "sec10_1.txt", "sec2_9.txt", "sec3_2.txt", "sec10_11.txt"
+    };
+
+    sort(files.begin(), files.end(), natural_less);
+
+    cout << "Sorted file names:\n";
+    for (const string& file : files) {
+        cout << file << "\n";
+    }
+
+    return 0;
+}
