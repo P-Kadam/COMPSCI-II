@@ -1,0 +1,86 @@
+//
+//  main.cpp
+//  11.14.8
+//
+//  Created by Xander Noboa on 7/11/25.
+// Tested by Guillermo Chavarin
+
+#include <iostream>
+#include <memory>
+#include <string>
+using namespace std;
+
+class DiskMover {
+public:
+    DiskMover(int n, int source, int target)
+        : n(n), source(source), target(target), state(BEFORE_LARGEST) {
+        if (n > 1) {
+            spare = 6 - source - target;
+            helper = unique_ptr<DiskMover>(new DiskMover(n - 1, source, spare));
+        }
+    }
+
+    bool has_more_moves() {
+        return state != DONE;
+    }
+
+    string next_move() {
+        switch (state) {
+            case BEFORE_LARGEST:
+                if (helper && helper->has_more_moves()) {
+                    return helper->next_move();
+                } else {
+                    helper.reset(); // Done with before-helper
+                    state = LARGEST;
+                    // fallthrough to LARGEST
+                }
+
+            case LARGEST:
+                state = AFTER_LARGEST;
+                return "Move disk from peg " + to_string(source) + " to peg " + to_string(target);
+
+            case AFTER_LARGEST:
+                if (!after_helper) {
+                    after_helper = unique_ptr<DiskMover>(new DiskMover(n - 1, spare, target));
+                }
+                if (after_helper->has_more_moves()) {
+                    return after_helper->next_move();
+                } else {
+                    after_helper.reset();
+                    state = DONE;
+                    return "";
+                }
+
+            case DONE:
+                return "";
+        }
+        return "";
+    }
+
+private:
+    enum State { BEFORE_LARGEST, LARGEST, AFTER_LARGEST, DONE };
+    int n;
+    int source;
+    int target;
+    int spare;
+    State state;
+    unique_ptr<DiskMover> helper;
+    unique_ptr<DiskMover> after_helper;
+};
+
+int main() {
+    int disks = 3; // Change to 5 for the original problem
+    DiskMover mover(disks, 1, 3);
+    int move_count = 0;
+
+    while (mover.has_more_moves()) {
+        string move = mover.next_move();
+        if (!move.empty()) {
+            cout << move << endl;
+            move_count++;
+        }
+    }
+
+    cout << "Total moves: " << move_count << endl;
+    return 0;
+}
