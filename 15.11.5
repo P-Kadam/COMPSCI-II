@@ -1,0 +1,75 @@
+// Program: 15.11.5
+// Programmer: Riya Kanyan
+
+#include <iostream>
+#include <string>
+#include <map>
+using namespace std;
+
+// Student class
+class Student {
+public:
+    string first_name;
+    string last_name;
+    int id;
+
+    Student(string first, string last, int student_id)
+        : first_name(first), last_name(last), id(student_id) {}
+
+    // Comparison operator for sorting in map
+    bool operator<(const Student& other) const {
+        if (last_name != other.last_name)
+            return last_name < other.last_name;
+        if (first_name != other.first_name)
+            return first_name < other.first_name;
+        return id < other.id;
+    }
+};
+
+int main() {
+    map<Student, double> student_grades; // Sorts by Student object
+    map<int, Student> id_lookup;        // Lookup by ID
+
+    // Sample data
+    Student s1("John", "Smith", 101);
+    Student s2("Jane", "Doe", 102);
+    Student s3("Alice", "Brown", 103);
+
+    student_grades[s1] = 85.5;
+    student_grades[s2] = 92.0;
+    student_grades[s3] = 78.0;
+
+    id_lookup[s1.id] = s1;
+    id_lookup[s2.id] = s2;
+    id_lookup[s3.id] = s3;
+
+    // Change grade by ID
+    int id_to_change = 102;
+    if (id_lookup.find(id_to_change) != id_lookup.end()) {
+        Student student = id_lookup[id_to_change];
+        student_grades[student] = 95.0; // Update grade
+        cout << "Updated grade for " << student.first_name << " "
+             << student.last_name << endl;
+    }
+
+    // Remove student by ID
+    int id_to_remove = 103;
+    if (id_lookup.find(id_to_remove) != id_lookup.end()) {
+        Student student = id_lookup[id_to_remove];
+        student_grades.erase(student);
+        id_lookup.erase(id_to_remove);
+        cout << "Removed student " << student.first_name << " "
+             << student.last_name << endl;
+    }
+
+    // Print sorted students
+    cout << "\nStudents sorted by last name, first name, ID:\n";
+    for (const auto& entry : student_grades) {
+        const Student& student = entry.first;
+        double grade = entry.second;
+        cout << student.last_name << ", " << student.first_name
+             << " (ID: " << student.id << ") - Grade: " << grade << endl;
+    }
+
+    return 0;
+}
