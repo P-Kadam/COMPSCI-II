@@ -1,0 +1,89 @@
+//
+//  main.cpp
+//  7.20.8
+//
+//  Tested by Xander Noboa on 7/11/25.
+//
+// Created by Pradnya Kadam
+
+
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+// Student Structure
+struct Student {
+    string firstName;
+    string lastName;
+    char courseGrade;
+};
+
+// Print function
+void PrintInfo(vector<Student*> students) {
+    char grades[5] = {'A', 'B', 'C', 'D', 'F'};
+    
+    for (int j = 0; j < 5; j++) {
+        for (int k = 0; k < students.size(); k++) {
+            if (students[k]->courseGrade == grades[j]) {
+                cout << students[k]->firstName << " "
+                     << students[k]->lastName << " "
+                     << students[k]->courseGrade << endl;
+            }
+        }
+    }
+}
+
+int main() {
+    string input;
+    cout << "Please enter the Student's (1) first name (2) last name (3) grade!" << endl;
+    cout << "Enter '-1' when complete!" << endl;
+    
+    vector<Student*> students;
+    
+    while (true) {
+        getline(cin, input);
+        if (input == "-1") {
+            break;
+        }
+        
+        stringstream strm(input);
+        string fName, lName;
+        char grade;
+        
+        if (!(strm >> fName >> lName >> grade) || !isalpha(grade)) {
+            cout << "ERROR: invalid input" << endl;
+            continue;
+        }
+        
+        char validGrades[5] = {'A', 'B', 'C', 'D', 'F'};
+        bool isValid = false;
+        
+        for (int i = 0; i < 5; i++) {
+            if (validGrades[i] == grade) {
+                isValid = true;
+                break;
+            }
+        }
+        
+        if (!isValid) {
+            cout << "ERROR: invalid grade" << endl;
+            continue;
+        }
+        
+        Student* ptr = new Student{fName, lName, grade};
+        students.push_back(ptr);
+    }
+    
+    PrintInfo(students);
+    
+    // Deallocate memory
+    for (auto& student : students) {
+        delete student;
+    }
+    
+    return 0;
+}
